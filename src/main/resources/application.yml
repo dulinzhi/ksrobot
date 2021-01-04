@@ -1,0 +1,12 @@
+spring:
+  mvc:
+    static-path-pattern: /static/**
+    view:
+      suffix: .html
+      prefix: /static/
+  web:
+    resources:
+      static-locations: classpath:/static/
+
+server:
+  port: 22599
