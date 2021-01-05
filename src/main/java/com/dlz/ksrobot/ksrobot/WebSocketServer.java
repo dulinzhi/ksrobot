@@ -9,6 +9,9 @@ import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -56,7 +59,7 @@ public class WebSocketServer {
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
-                                //                System.out.println("发送数据：" + message);
+                                // System.out.println("发送数据：" + message);
                                 try {
                                     session.getBasicRemote().sendBinary(ByteBuffer.wrap(data));
                                 } catch (IOException e) {
@@ -70,6 +73,7 @@ public class WebSocketServer {
         };
         fixedThreadPool.execute(runnable);
     }
+
     private byte[] createImage()throws Exception{
         BufferedImage bufferedImage =robotUtil.screenshot();
          //创建一段内存流
@@ -91,6 +95,15 @@ public class WebSocketServer {
         }
     }
 
+    public List<String> listOfPeople(){
+        List<String> users = new ArrayList<>();
+        for (Map.Entry<String,Session> in:
+        sessionPools.entrySet()) {
+            users.add(in.getKey());
+        }
+        return users;
+    }
+
     //建立连接成功调用
     @OnOpen
     public void onOpen(Session session, @PathParam(value = "sid") String userName){
@@ -103,7 +116,6 @@ public class WebSocketServer {
             e.printStackTrace();
         }
     }
-
     //关闭连接时调用
     @OnClose
     public void onClose(@PathParam(value = "sid") String userName){
@@ -111,7 +123,6 @@ public class WebSocketServer {
         subOnlineCount();
         System.out.println(userName + "断开webSocket连接！当前人数为" + onlineNum);
     }
-
     //收到客户端信息
     @OnMessage
     public void onMessage(String message) throws IOException{
@@ -123,19 +134,30 @@ public class WebSocketServer {
         }
         if(jsonObject.containsKey("mouseClick")){
            // Integer.parseInt(String.valueOf(jsonObject.containsKey("MouseClick")))
-            robotUtil.clickMouse(Integer.parseInt(String.valueOf(jsonObject.get("mouseClick"))));
+            Integer key = Integer.parseInt(String.valueOf(jsonObject.get("mouseClick")));
+            if(key < 4){
+                robotUtil.clickMouse(key);
+            } else {
+                robotUtil.ReleaseMouse(key);
+            }
         }
         if(jsonObject.containsKey("key")){
-            robotUtil.input(Integer.parseInt(String.valueOf(jsonObject.get("key"))));
+            if(Integer.parseInt(jsonObject.get("status").toString())==0){
+                robotUtil.input(Integer.parseInt(String.valueOf(jsonObject.get("key"))));
+            } else{
+                robotUtil.releaseInput(Integer.parseInt(String.valueOf(jsonObject.get("key"))));
+            }
         }
-      /*  for (Session session: sessionPools.values()) {
+      /*
+        for (Session session: sessionPools.values()) {
             try {
                 sendMessage(session, message);
             } catch(Exception e){
                 e.printStackTrace();
                 continue;
             }
-        }*/
+        }
+        */
     }
 
     //错误时调用
@@ -144,7 +166,6 @@ public class WebSocketServer {
         System.out.println("发生错误");
         throwable.printStackTrace();
     }
-
     public static void addOnlineCount(){
         onlineNum.incrementAndGet();
     }

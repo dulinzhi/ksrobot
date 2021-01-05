@@ -6,6 +6,7 @@ import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 
@@ -57,31 +58,42 @@ public class RobotUtil {
         switch (key) {
             case 1:
                 robot.mousePress(InputEvent.BUTTON1_MASK); //按下左键
-                robot.delay(100);
-                robot.mouseRelease(InputEvent.BUTTON1_MASK); //松开左键
                 break;
             case 2:
                 robot.mousePress(InputEvent.BUTTON2_MASK); //按下滚轴键
-                robot.delay(100);
-                robot.mouseRelease(InputEvent.BUTTON2_MASK); //松开滚轴键
                 break;
             case 3:
                 robot.mousePress(InputEvent.BUTTON3_MASK); //按下右键
-                robot.delay(100);
-                robot.mouseRelease(InputEvent.BUTTON3_MASK); //松开右键
                 break;
             default:
                 robot.mousePress(InputEvent.BUTTON1_MASK); //按下左键
-                robot.delay(100);
+                break;
+        }
+    }
+    // 鼠标松开事件
+    public void ReleaseMouse(int key){
+        switch (key) {
+            case 4:
+                robot.mouseRelease(InputEvent.BUTTON1_MASK); //松开左键
+                break;
+            case 5:
+                robot.mouseRelease(InputEvent.BUTTON2_MASK); //松开滚轴键
+                break;
+            case 6:
+                robot.mouseRelease(InputEvent.BUTTON3_MASK); //松开右键
+                break;
+            default:
                 robot.mouseRelease(InputEvent.BUTTON1_MASK); //松开左键
                 break;
         }
     }
-
+    // 输入按下
     public void input(Integer key){
             robot.keyPress(key);
-            robot.delay(50);
-            robot.keyRelease(key);
+    }
+    // 输入松开
+    public void releaseInput(Integer key){
+        robot.keyRelease(key);
     }
     public BufferedImage screenshot(){
          return robot.createScreenCapture(new Rectangle(0, 0, screenSize.width, screenSize.height));
